@@ -1,4 +1,8 @@
 const validateMiddleware = (validationSchema) => async (req, res, next) => {
+  /**
+   * If req.files or req.file has a value, will skips validating.
+   * because it has already validated inside multer fileFilter
+   */
   if (
     (typeof req.files !== "undefined" && req.files?.length !== 0) ||
     typeof req.file !== "undefined"
