@@ -1,22 +1,20 @@
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState } from "react";
 import styled from "styled-components/macro";
 
 import Container from "@components/core/Container";
 import Text from "@components/core/Text";
 import TextField from "@components/core/TextField";
 import ButtonOutlined from "@components/core/ButtonOutlined";
-import IconButton from "@components/core/IconButton";
 
 import SearchIcon from "@components/icons/Search";
-import ShoppingCartIcon from "@components/icons/ShoppingCart";
 
-import { currencyFormat } from "@utils/currency";
+import Product from "./components/Product";
 
-import { CartContext } from "@contexts/CartContext";
 import { UserContext } from "@contexts/UserContext";
 
 import productAPI from "@lib/api/products";
 
+import useCart from "@hooks/useCart";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import useDebounce from "@hooks/useDebounce";
@@ -60,82 +58,6 @@ S.ProductsListContainer = styled.div`
   @media (min-width: 1024px) {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
-`;
-
-S.ProductItem = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  border-radius: 16px;
-  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-
-  /* transition: transform 0.1s ease-in-out;
-  &:hover {
-    transform: scale(1.02);
-  } */
-`;
-
-S.ProductImageWrapper = styled.div`
-  width: 100%;
-  padding-top: 100%;
-  position: relative;
-  cursor: pointer;
-`;
-
-S.ProductImage = styled.img`
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none;
-`;
-
-S.ProductDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: min(16px, 2vw);
-  min-width: 0;
-`;
-
-S.ProductName = styled(Text).attrs({
-  as: "a",
-})`
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-`;
-
-S.ProductCode = styled(Text).attrs({
-  as: "span",
-})`
-  font-weight: 300;
-  color: #6c6c70;
-`;
-
-S.ProductItemFooter = styled.div`
-  margin-top: 24px;
-  display: flex;
-  align-items: center;
-  align-self: flex-end;
-`;
-
-S.ProductPrice = styled(Text).attrs({
-  as: "span",
-})`
-  color: #e13b30;
-  font-family: Prompt;
-  font-weight: 600;
-`;
-
-S.AddToCartButton = styled(IconButton)`
-  margin-right: 8px;
-  width: 32px;
-  height: 32px;
 `;
 
 const ProductsList = () => {
@@ -205,30 +127,34 @@ const ProductsList = () => {
       })
   );
 
-  // useEffect(() => {
-  //   const fetchProducts = async () => {
-  //     clearTimeout(handleSearchingTimeout.current);
-  //     handleSearchingTimeout.current = setTimeout(async () => {
-  //       try {
-  //         const results = await productAPI.getProducts({
-  //           q: searchTerm,
-  //         });
-  //         setProducts(results);
-  //       } catch (err) {
-  //         console.error(err);
-  //       }
-  //     }, 400);
-  //   };
-  //   fetchProducts();
-  // }, [searchTerm]);
-
   const {
     action: { addCartItem },
-  } = useContext(CartContext);
+  } = useCart();
 
   const {
     state: { mode },
   } = useContext(UserContext);
+
+  let content;
+
+  if (isLoading) {
+    content = <div>กำลังโหลด...</div>;
+  } else if (products.length === 0) {
+    content = <div>ไม่มีรายการสินค้าที่ค้นหา</div>;
+  } else {
+    content = (
+      <S.ProductsListContainer>
+        {products.map((product) => (
+          <Product
+            key={product._id}
+            product={product}
+            onAddCartItem={addCartItem}
+            canAddCartItem={mode === "buyer"}
+          />
+        ))}
+      </S.ProductsListContainer>
+    );
+  }
 
   return (
     <S.Wrapper>
@@ -249,57 +175,7 @@ const ProductsList = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Name, Code"
         />
-        <S.ProductsListContainer>
-          {isLoading ? (
-            <div>กำลังโหลด...</div>
-          ) : products.length === 0 ? (
-            <div>ไม่มีรายการสินค้าที่ค้นหา</div>
-          ) : (
-            products.map((item) => (
-              <S.ProductItem key={item._id}>
-                <S.ProductImageWrapper
-                  onClick={() => navigate(`/products/${item._id}`)}
-                >
-                  <S.ProductImage src={item.images[0]} alt={item.name} />
-                </S.ProductImageWrapper>
-                <S.ProductDetails>
-                  <S.ProductName
-                    size={{
-                      xs: 0.85,
-                      sm: 1,
-                    }}
-                    onClick={() => navigate(`/products/${item._id}`)}
-                  >
-                    {item.name}
-                  </S.ProductName>
-                  <S.ProductCode
-                    size={{
-                      xs: 0.75,
-                      sm: 0.85,
-                    }}
-                  >
-                    {item.code}
-                  </S.ProductCode>
-                  <S.ProductItemFooter>
-                    {mode === "buyer" && (
-                      <S.AddToCartButton onClick={() => addCartItem(item, 1)}>
-                        <ShoppingCartIcon />
-                      </S.AddToCartButton>
-                    )}
-                    <S.ProductPrice
-                      size={{
-                        xs: 1,
-                        sm: 1.25,
-                      }}
-                    >
-                      {currencyFormat(item.price)}
-                    </S.ProductPrice>
-                  </S.ProductItemFooter>
-                </S.ProductDetails>
-              </S.ProductItem>
-            ))
-          )}
-        </S.ProductsListContainer>
+        {content}
       </Container>
     </S.Wrapper>
   );

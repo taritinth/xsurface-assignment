@@ -1,8 +1,6 @@
 import styled from "styled-components/macro";
 import { motion } from "framer-motion";
 
-import { useContext } from "react";
-
 import ButtonSolid from "@components/core/ButtonSolid";
 import IconButton from "@components/core/IconButton";
 import Text from "@components/core/Text";
@@ -11,7 +9,7 @@ import CloseIcon from "@components/icons/Close";
 import MinusIcon from "@components/icons/Minus";
 import PlusIcon from "@components/icons/Plus";
 
-import { CartContext } from "@contexts/CartContext";
+import useCart from "@hooks/useCart";
 
 import { currencyFormat } from "@utils/currency";
 
@@ -93,6 +91,7 @@ S.ProductCode = styled(Text).attrs({
 })`
   font-weight: 300;
   color: #6c6c70;
+  text-transform: uppercase;
 `;
 
 S.ProductPrice = styled(Text).attrs({
@@ -130,7 +129,7 @@ const Cart = () => {
   const {
     data: { cart, paymentAmount },
     action: { toggleCart, increaseCartItem, decreaseCartItem, removeCartItem },
-  } = useContext(CartContext);
+  } = useCart();
 
   return (
     <>

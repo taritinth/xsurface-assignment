@@ -37,7 +37,7 @@ const ButtonBase = forwardRef(function ButtonBase(props, ref) {
       ref={ref}
       onClick={(e) => {
         if (!disabled) {
-          onClick?.();
+          onClick?.(e);
         } else {
           e.preventDefault();
         }
