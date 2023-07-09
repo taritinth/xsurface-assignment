@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 
 import { useContext } from "react";
 
-import ButtonBase from "@components/core/ButtonBase";
+import ButtonSolid from "@components/core/ButtonSolid";
+import IconButton from "@components/core/IconButton";
 import Text from "@components/core/Text";
 
 import CloseIcon from "@components/icons/Close";
@@ -116,14 +117,11 @@ S.CartFooter = styled.div`
   background-color: #fff;
 `;
 
-S.CheckoutButton = styled(ButtonBase)`
-  color: #fff;
-  background: #e04132;
+S.CheckoutButton = styled(ButtonSolid)`
   width: 100%;
 `;
 
-S.ActionButton = styled(ButtonBase)`
-  padding: 6px;
+S.ActionButton = styled(IconButton)`
   width: 32px;
   height: 32px;
 `;
@@ -152,9 +150,9 @@ const Cart = () => {
           <Text size={{ sm: 1.25 }} font="secondary">
             ตะกร้า ({cart.length})
           </Text>
-          <S.ActionButton onClick={toggleCart}>
+          <IconButton onClick={toggleCart}>
             <CloseIcon />
-          </S.ActionButton>
+          </IconButton>
         </S.CartHeader>
         <S.CartItemsList>
           {cart.map((item) => (
@@ -183,14 +181,15 @@ const Cart = () => {
                   <span style={{ paddingInline: 4 }}>{item.quantity}</span>
                   <S.ActionButton
                     onClick={() => increaseCartItem(item.product)}
+                    disabled={item.product.quantity === item.quantity}
                   >
                     <PlusIcon size={12} />
                   </S.ActionButton>
                 </S.ProductQuantity>
               </S.ProductDetails>
-              <S.ActionButton onClick={() => removeCartItem(item.product)}>
+              <IconButton onClick={() => removeCartItem(item.product)}>
                 <CloseIcon size={16} />
-              </S.ActionButton>
+              </IconButton>
             </S.CartItem>
           ))}
         </S.CartItemsList>

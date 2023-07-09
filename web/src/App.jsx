@@ -1,13 +1,7 @@
 import { useContext } from "react";
 import styled from "styled-components/macro";
 
-import {
-  Link,
-  Routes,
-  Route,
-  BrowserRouter as Router,
-  Navigate,
-} from "react-router-dom";
+import { Link, Routes, Route, Navigate } from "react-router-dom";
 
 import { UserContext } from "@contexts/UserContext";
 import { CartContext } from "@contexts/CartContext";
@@ -18,6 +12,9 @@ import AddProduct from "@features/Products/AddProduct";
 import ProductDetails from "@features/Products/ProductDetails";
 
 import ButtonBase from "@components/core/ButtonBase";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const S = {};
 
@@ -92,9 +89,11 @@ function App() {
     action: { toggleCart },
   } = useContext(CartContext);
 
+  const queryClient = new QueryClient();
+
   return (
     <>
-      <Router>
+      <QueryClientProvider client={queryClient}>
         <S.Navbar>
           <S.Container $maxWidth="xl">
             <S.NavItemGroup>
@@ -139,14 +138,17 @@ function App() {
               </S.ModeSelection>
             </S.NavItemGroup>
             <S.NavItemGroup>
-              <ButtonBase onClick={toggleCart}>
-                ตะกร้า ({cart.length})
-              </ButtonBase>
+              {mode === "buyer" && (
+                <ButtonBase onClick={toggleCart}>
+                  ตะกร้า ({cart.length})
+                </ButtonBase>
+              )}
             </S.NavItemGroup>
           </S.Container>
         </S.Navbar>
         <S.Content>{routes}</S.Content>
-      </Router>
+        <ReactQueryDevtools />
+      </QueryClientProvider>
     </>
   );
 }

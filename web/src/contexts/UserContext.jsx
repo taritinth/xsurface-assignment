@@ -1,9 +1,10 @@
-import { createContext, useState } from "react";
+import { createContext } from "react";
+import { useLocalStorage } from "@hooks/useLocalStorage";
 
 export const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
-  const [mode, setMode] = useState("seller");
+  const [mode, setMode] = useLocalStorage("mode", "seller");
 
   const userStore = {
     state: { mode },

@@ -24,7 +24,7 @@ S.Icon = styled.div`
 S.Input = styled.input`
   font-size: 0.95rem;
   width: 100%;
-  height: 46px;
+  height: 100%;
   padding: 12px 24px;
   ${(props) => props.$Icon && `padding-left: 56px;`}
   border-radius: 25px;

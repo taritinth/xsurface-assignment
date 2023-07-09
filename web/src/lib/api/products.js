@@ -1,4 +1,4 @@
-import axios from "@utils/axios";
+import { axios } from "@utils/axios";
 
 function getParams(options) {
   if (!options) return;
@@ -12,8 +12,8 @@ function getParams(options) {
 
 const methods = {
   async addProduct(data) {
-    const { data: response } = await axios.post(`/api/v1/products`, {
-      data,
+    const { data: response } = await axios.post(`/api/v1/products`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
   },
@@ -24,8 +24,8 @@ const methods = {
   },
   async getProductByID(id) {
     const { data: response } = await axios.get(`/api/v1/products/${id}`);
-    return response.data;
+    return response.data.product;
   },
 };
 
-export default { ...methods };
+export default methods;

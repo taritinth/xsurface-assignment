@@ -29,10 +29,11 @@ S.ButtonBase = styled.a`
 `;
 
 const ButtonBase = forwardRef(function ButtonBase(props, ref) {
-  const { children, disabled, onClick, ...rest } = props;
+  const { className, children, disabled, onClick, ...rest } = props;
 
   return (
     <S.ButtonBase
+      className={className}
       ref={ref}
       onClick={(e) => {
         if (!disabled) {

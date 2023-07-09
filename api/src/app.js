@@ -11,6 +11,8 @@ const PORT = process.env.PORT || 8080;
 
 const router = require("./api");
 
+app.use("/static", express.static("uploads"));
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
