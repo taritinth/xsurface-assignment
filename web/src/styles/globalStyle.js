@@ -7,6 +7,7 @@ const GlobalStyle = createGlobalStyle`
         --zindex-drawer: 1030;
         --zindex-modal-backdrop: 1040;
         --zindex-modal: 1050;
+        --zindex-loading-backdrop: 1060;
     }
 
     *, *::before, *::after {

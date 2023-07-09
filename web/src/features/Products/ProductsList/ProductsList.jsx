@@ -8,6 +8,7 @@ import ButtonOutlined from "@components/core/ButtonOutlined";
 
 import SearchIcon from "@components/icons/Search";
 
+import AltText from "@components/ui/AltText";
 import Product from "./components/Product";
 
 import { UserContext } from "@contexts/UserContext";
@@ -140,11 +141,17 @@ const ProductsList = () => {
   let content;
 
   if (isLoading) {
-    content = <div>กำลังโหลด...</div>;
+    content = (
+      <S.ProductsListContainer>
+        {[...new Array(25)].map((_, index) => (
+          <Product key={index} skeleton />
+        ))}
+      </S.ProductsListContainer>
+    );
   } else if (isError) {
-    content = <div>มีบางอย่างผิดพลาด</div>;
+    content = <AltText message="มีบางอย่างผิดพลาด" />;
   } else if (products.length === 0) {
-    content = <div>ไม่มีรายการสินค้าที่ค้นหา</div>;
+    content = <AltText message="ไม่มีรายการสินค้าที่ค้นหา" />;
   } else {
     content = (
       <S.ProductsListContainer>

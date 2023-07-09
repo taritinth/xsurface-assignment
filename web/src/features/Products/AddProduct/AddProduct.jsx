@@ -6,6 +6,7 @@ import Text from "@components/core/Text";
 import TextField from "@components/core/TextField";
 import ButtonOutlined from "@components/core/ButtonOutlined";
 import ButtonSolid from "@components/core/ButtonSolid";
+import Loading from "@components/core/Loading";
 
 import UploadBox from "./components/UploadBox";
 
@@ -13,6 +14,7 @@ import { UserContext } from "@contexts/UserContext";
 
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import { useMutation } from "@tanstack/react-query";
 
 import productAPI from "@lib/api/products";
 import { validFileExtensions } from "@utils/file";
@@ -64,6 +66,21 @@ S.ActionButtonGroup = styled.div`
 `;
 
 const AddProduct = () => {
+  const productMutation = useMutation({
+    mutationFn: (newProduct) => productAPI.addProduct(newProduct),
+    onSuccess: () => {
+      enqueueSnackbar(RESPONSE.SAVE_SUCCESS, {
+        variant: "success",
+      });
+      navigate("/products");
+    },
+    onError: () => {
+      enqueueSnackbar("เกิดข้อผิดพลาดขึ้น, กรุณาลองใหม่อีกครั้ง", {
+        variant: "error",
+      });
+    },
+  });
+
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -158,13 +175,7 @@ const AddProduct = () => {
           data.append(field, formData[field]);
         }
       }
-
-      await productAPI.addProduct(data);
-
-      enqueueSnackbar(RESPONSE.SAVE_SUCCESS, {
-        variant: "success",
-      });
-      navigate("/products");
+      productMutation.mutate(data);
     } catch (err) {
       console.error(err);
     }
@@ -180,6 +191,7 @@ const AddProduct = () => {
 
   return (
     <S.Wrapper>
+      {productMutation.isLoading && <Loading />}
       <Container $maxWidth="xl">
         <S.Title as="h1" size={{ xs: 1.25, sm: 1.5 }} weight={600}>
           Update Product

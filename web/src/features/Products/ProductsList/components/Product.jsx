@@ -1,5 +1,6 @@
 import styled from "styled-components/macro";
 
+import Skeleton from "@components/core/Skeleton";
 import IconButton from "@components/core/IconButton";
 
 import ShoppingCartIcon from "@components/icons/ShoppingCart";
@@ -87,48 +88,80 @@ S.AddToCartButton = styled(IconButton)`
   height: 32px;
 `;
 
-const Product = ({ product, onAddCartItem, canAddCartItem }) => {
+const Product = ({ product, onAddCartItem, canAddCartItem, skeleton }) => {
   const navigate = useNavigate();
 
   return (
-    <S.ProductItem key={product._id}>
-      <S.ProductImageWrapper
-        onClick={() => navigate(`/products/${product._id}`)}
-      >
-        <S.ProductImage src={product.images[0]} alt={product.name} />
-      </S.ProductImageWrapper>
+    <S.ProductItem>
+      {skeleton ? (
+        <Skeleton $height="100%" $aspectRatio={1} />
+      ) : (
+        <S.ProductImageWrapper
+          onClick={() =>
+            skeleton ? null : navigate(`/products/${product._id}`)
+          }
+        >
+          <S.ProductImage src={product.images[0]} alt={product.name} />
+        </S.ProductImageWrapper>
+      )}
       <S.ProductDetails>
-        <S.ProductName
-          size={{
-            xs: 0.85,
-            sm: 1,
-          }}
-          onClick={() => navigate(`/products/${product._id}`)}
-        >
-          {product.name}
-        </S.ProductName>
-        <S.ProductCode
-          size={{
-            xs: 0.75,
-            sm: 0.85,
-          }}
-        >
-          {product.code}
-        </S.ProductCode>
-        <S.ProductItemFooter>
-          {canAddCartItem && (
-            <S.AddToCartButton onClick={() => onAddCartItem(product, 1)}>
-              <ShoppingCartIcon />
-            </S.AddToCartButton>
-          )}
-          <S.ProductPrice
+        {skeleton ? (
+          <Skeleton $borderRadius={8} />
+        ) : (
+          <S.ProductName
             size={{
-              xs: 1,
-              sm: 1.25,
+              xs: 0.85,
+              sm: 1,
+            }}
+            onClick={() =>
+              skeleton ? null : navigate(`/products/${product._id}`)
+            }
+          >
+            {product.name}
+          </S.ProductName>
+        )}
+        {skeleton ? (
+          <Skeleton $width={100} $borderRadius={8} $marginTop={6} />
+        ) : (
+          <S.ProductCode
+            size={{
+              xs: 0.75,
+              sm: 0.85,
             }}
           >
-            {currencyFormat(product.price)}
-          </S.ProductPrice>
+            {product.code}
+          </S.ProductCode>
+        )}
+        <S.ProductItemFooter>
+          {skeleton ? (
+            <>
+              <Skeleton
+                $width={32}
+                $height={32}
+                $borderRadius="50%"
+                $marginRight={12}
+              />
+              <Skeleton $width={100} $height={18} $borderRadius={8} />
+            </>
+          ) : (
+            <>
+              {canAddCartItem && (
+                <S.AddToCartButton
+                  onClick={() => (skeleton ? null : onAddCartItem(product, 1))}
+                >
+                  <ShoppingCartIcon />
+                </S.AddToCartButton>
+              )}
+              <S.ProductPrice
+                size={{
+                  xs: 1,
+                  sm: 1.25,
+                }}
+              >
+                {currencyFormat(product.price)}
+              </S.ProductPrice>
+            </>
+          )}
         </S.ProductItemFooter>
       </S.ProductDetails>
     </S.ProductItem>

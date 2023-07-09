@@ -21,7 +21,7 @@ S.CartBackdrop = styled(motion.div)`
   inset: 0;
   height: 100%;
   width: 100%;
-  background-color: rgb(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.7);
 `;
 
 S.CartWrapper = styled(motion.div)`
