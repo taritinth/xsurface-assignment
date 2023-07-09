@@ -123,11 +123,13 @@ S.AddToCartButton = styled(ButtonOutlined)`
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const { data: product, isLoading } = useQuery(
-    ["product"],
-    () => productAPI.getProductByID(id),
-    { cacheTime: 0 }
-  );
+  const {
+    data: product,
+    isLoading,
+    isError,
+  } = useQuery(["product"], () => productAPI.getProductByID(id), {
+    cacheTime: 0,
+  });
   const [quantity, setQuantity] = useState(1);
 
   const handleUpdateQty = (e) => {
@@ -156,68 +158,75 @@ const ProductDetails = () => {
     state: { mode },
   } = useContext(UserContext);
 
+  let content;
+  if (isLoading) {
+    content = <div>กำลังโหลด...</div>;
+  } else if (isError) {
+    content = <div>มีบางอย่างผิดพลาด</div>;
+  } else if (!product) {
+    content = <div>ไม่มีรายการสินค้าที่ต้องการ</div>;
+  } else {
+    content = (
+      <S.ProductWrapper>
+        <S.ProductImageSection>
+          <ProductPreview images={product.images} />
+        </S.ProductImageSection>
+        <S.ProductDetailsSection>
+          <S.ProductName size={{ xs: 1.2, sm: 1.4 }}>
+            {product.name}
+          </S.ProductName>
+          <S.ProductCode size={{ xs: 0.85, sm: 0.85 }}>
+            {product.code}
+          </S.ProductCode>
+          <S.ProductPrice size={{ xs: 1.5, sm: 1.75 }}>
+            {currencyFormat(product.price)}
+          </S.ProductPrice>
+          <S.SelectQuantity>
+            <S.ActionButton
+              onClick={handleDecreaseQty}
+              disabled={mode !== "buyer" || quantity === 1}
+            >
+              <MinusIcon size={12} />
+            </S.ActionButton>
+            <S.QuantityTextField
+              value={quantity}
+              onChange={handleUpdateQty}
+              disabled={mode !== "buyer"}
+            />
+            <S.ActionButton
+              onClick={handleIncreaseQty}
+              disabled={mode !== "buyer" || product.quantity === quantity}
+            >
+              <PlusIcon size={12} />
+            </S.ActionButton>
+            <span style={{ marginLeft: 8 }}>
+              คลังสินค้า : {product.quantity}
+            </span>
+          </S.SelectQuantity>
+          <S.AddToCartButton
+            onClick={() => addCartItem(product, quantity)}
+            disabled={mode !== "buyer"}
+          >
+            เพิ่มลงตะกร้า
+          </S.AddToCartButton>
+          {mode !== "buyer" && (
+            <Text
+              as="span"
+              style={{ marginTop: 12 }}
+              size={{ xs: 0.8 }}
+              font="secondary"
+            >
+              *เปิดโหมดผู้ซื้อเพื่อใช้งานฟังก์ชันตะกร้าสินค้า
+            </Text>
+          )}
+        </S.ProductDetailsSection>
+      </S.ProductWrapper>
+    );
+  }
+
   return (
     <S.Wrapper>
-      <Container $maxWidth="xl">
-        {isLoading ? (
-          <div>กำลังโหลด...</div>
-        ) : (
-          <S.ProductWrapper>
-            <S.ProductImageSection>
-              <ProductPreview images={product.images} />
-            </S.ProductImageSection>
-            <S.ProductDetailsSection>
-              <S.ProductName size={{ xs: 1.2, sm: 1.4 }}>
-                {product.name}
-              </S.ProductName>
-              <S.ProductCode size={{ xs: 0.85, sm: 0.85 }}>
-                {product.code}
-              </S.ProductCode>
-              <S.ProductPrice size={{ xs: 1.5, sm: 1.75 }}>
-                {currencyFormat(product.price)}
-              </S.ProductPrice>
-              <S.SelectQuantity>
-                <S.ActionButton
-                  onClick={handleDecreaseQty}
-                  disabled={mode !== "buyer" || quantity === 1}
-                >
-                  <MinusIcon size={12} />
-                </S.ActionButton>
-                <S.QuantityTextField
-                  value={quantity}
-                  onChange={handleUpdateQty}
-                  disabled={mode !== "buyer"}
-                />
-                <S.ActionButton
-                  onClick={handleIncreaseQty}
-                  disabled={mode !== "buyer" || product.quantity === quantity}
-                >
-                  <PlusIcon size={12} />
-                </S.ActionButton>
-                <span style={{ marginLeft: 8 }}>
-                  คลังสินค้า : {product.quantity}
-                </span>
-              </S.SelectQuantity>
-              <S.AddToCartButton
-                onClick={() => addCartItem(product, quantity)}
-                disabled={mode !== "buyer"}
-              >
-                เพิ่มลงตะกร้า
-              </S.AddToCartButton>
-              {mode !== "buyer" && (
-                <Text
-                  as="span"
-                  style={{ marginTop: 12 }}
-                  size={{ xs: 0.8 }}
-                  font="secondary"
-                >
-                  *เปิดโหมดผู้ซื้อเพื่อใช้งานฟังก์ชันตะกร้าสินค้า
-                </Text>
-              )}
-            </S.ProductDetailsSection>
-          </S.ProductWrapper>
-        )}
-      </Container>
+      <Container $maxWidth="xl">{content}</Container>
     </S.Wrapper>
   );
 };

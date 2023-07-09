@@ -119,12 +119,14 @@ const ProductsList = () => {
   //   },
   // ]);
 
-  const { data: products, isLoading } = useQuery(
-    ["products", debouncedSearch],
-    () =>
-      productAPI.getProducts({
-        q: searchTerm,
-      })
+  const {
+    data: products,
+    isLoading,
+    isError,
+  } = useQuery(["products", debouncedSearch], () =>
+    productAPI.getProducts({
+      q: searchTerm,
+    })
   );
 
   const {
@@ -139,6 +141,8 @@ const ProductsList = () => {
 
   if (isLoading) {
     content = <div>กำลังโหลด...</div>;
+  } else if (isError) {
+    content = <div>มีบางอย่างผิดพลาด</div>;
   } else if (products.length === 0) {
     content = <div>ไม่มีรายการสินค้าที่ค้นหา</div>;
   } else {

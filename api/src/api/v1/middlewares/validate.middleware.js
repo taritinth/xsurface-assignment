@@ -1,5 +1,8 @@
 const validateMiddleware = (validationSchema) => async (req, res, next) => {
-  if (req.files?.length !== 0 || typeof req.file !== "undefined") {
+  if (
+    (typeof req.files !== "undefined" && req.files?.length !== 0) ||
+    typeof req.file !== "undefined"
+  ) {
     return next();
   }
   try {

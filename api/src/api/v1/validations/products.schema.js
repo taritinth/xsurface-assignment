@@ -9,6 +9,11 @@ const schema = {
     }),
     files: joi.array().min(1).max(6).required(),
   }),
+  getProductByID: joi.object({
+    params: joi.object({
+      id: joi.string().regex(/^[0-9a-fA-F]{24}$/),
+    }),
+  }),
 };
 
 module.exports = { ...schema };

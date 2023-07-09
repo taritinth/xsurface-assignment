@@ -14,6 +14,10 @@ router.post(
   products.addProduct
 );
 router.get("/products", products.getProducts);
-router.get("/products/:id", products.getProductByID);
+router.get(
+  "/products/:id",
+  validateMiddleware(schema.getProductByID),
+  products.getProductByID
+);
 
 module.exports = router;
