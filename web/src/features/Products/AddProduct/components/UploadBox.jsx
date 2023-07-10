@@ -93,6 +93,21 @@ S.DeleteSelectedImageButton = styled(IconButton)`
   background-color: #e04132;
 `;
 
+const SelectedImage = ({ image, onDeleteSelected }) => {
+  return (
+    <S.SelectedImageItemWrapper
+      transition={{ type: "spring", bounce: 0.25, duration: 0.2 }}
+      layout
+    >
+      <S.SelectedImage src={URL.createObjectURL(image)} />
+      <S.SelectedImageSize>{formatBytes(image.size)}</S.SelectedImageSize>
+      <S.DeleteSelectedImageButton onClick={onDeleteSelected}>
+        <CloseIcon color="#FFF" size={16} />
+      </S.DeleteSelectedImageButton>
+    </S.SelectedImageItemWrapper>
+  );
+};
+
 const UploadBox = ({
   isDragOver,
   onDrop,
@@ -145,21 +160,11 @@ const UploadBox = ({
       <S.SelectedImagesListContainer>
         <AnimatePresence>
           {selectedFiles.map((image, index) => (
-            <S.SelectedImageItemWrapper
-              transition={{ type: "spring", bounce: 0.25, duration: 0.2 }}
-              layout
+            <SelectedImage
+              image={image}
               key={index}
-            >
-              <S.SelectedImage src={URL.createObjectURL(image)} />
-              <S.SelectedImageSize>
-                {formatBytes(image.size)}
-              </S.SelectedImageSize>
-              <S.DeleteSelectedImageButton
-                onClick={() => onDeleteSelected(index)}
-              >
-                <CloseIcon color="#FFF" size={16} />
-              </S.DeleteSelectedImageButton>
-            </S.SelectedImageItemWrapper>
+              onDeleteSelected={() => onDeleteSelected(index)}
+            />
           ))}
         </AnimatePresence>
       </S.SelectedImagesListContainer>
