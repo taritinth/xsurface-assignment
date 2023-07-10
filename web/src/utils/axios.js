@@ -1,7 +1,10 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL:
+    import.meta.env.NODE_ENV === "production"
+      ? import.meta.env.VITE_PROD_API_URL
+      : import.meta.env.VITE_DEV_API_URL,
 });
 
 export { instance as axios };
