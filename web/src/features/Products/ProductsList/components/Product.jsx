@@ -97,9 +97,7 @@ const Product = ({ product, onAddCartItem, canAddCartItem, skeleton }) => {
         <Skeleton $height="100%" $aspectRatio={1} />
       ) : (
         <S.ProductImageWrapper
-          onClick={() =>
-            skeleton ? null : navigate(`/products/${product._id}`)
-          }
+          onClick={() => navigate(`/products/${product._id}`)}
         >
           <S.ProductImage src={product.images[0]} alt={product.name} />
         </S.ProductImageWrapper>
@@ -113,9 +111,7 @@ const Product = ({ product, onAddCartItem, canAddCartItem, skeleton }) => {
               xs: 0.85,
               sm: 1,
             }}
-            onClick={() =>
-              skeleton ? null : navigate(`/products/${product._id}`)
-            }
+            onClick={() => navigate(`/products/${product._id}`)}
           >
             {product.name}
           </S.ProductName>
@@ -146,9 +142,7 @@ const Product = ({ product, onAddCartItem, canAddCartItem, skeleton }) => {
           ) : (
             <>
               {canAddCartItem && (
-                <S.AddToCartButton
-                  onClick={() => (skeleton ? null : onAddCartItem(product, 1))}
-                >
+                <S.AddToCartButton onClick={() => onAddCartItem(product, 1)}>
                   <ShoppingCartIcon />
                 </S.AddToCartButton>
               )}
