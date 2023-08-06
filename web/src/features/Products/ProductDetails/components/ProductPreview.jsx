@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import styled from "styled-components/macro";
 
 import IconButton from "@components/core/IconButton";
@@ -43,6 +43,28 @@ S.ProductImageWrapper = styled.div`
   position: relative;
   border-radius: 8px;
   overflow: hidden;
+  /* background-image: url(${({ src }) => `"${src}"`});
+  background-position: 0% 0%;
+  background-size: contain;
+  background-repeat: no-repeat; */
+`;
+
+S.ProductImageZoom = styled.div`
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #fff;
+  background-image: url(${({ src }) => `"${src}"`});
+  background-position: 0% 0%;
+  /* background-size: contain; */
+  background-repeat: no-repeat;
+  border: solid;
+`;
+
+S.ZoomerContainer = styled.div`
+  position: relative;
 `;
 
 S.ProductImage = styled.img`
@@ -50,8 +72,11 @@ S.ProductImage = styled.img`
   left: 0;
   top: 0;
   width: 100%;
-  height: 100%;
-  pointer-events: none;
+  /* height: 100%; */
+  /* pointer-events: none; */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;
 
 S.SlideProductImage = styled(S.ProductImage)`
@@ -141,6 +166,11 @@ const ProductPreview = ({ images }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loaded, setLoaded] = useState(false);
 
+  const [isHover, setIsHover] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const zoomerRef = useRef(null);
+
   const [sliderRef, instanceRef] = useKeenSlider({
     initial: 0,
     drag: false,
@@ -154,6 +184,7 @@ const ProductPreview = ({ images }) => {
         spacing: 10,
       },
       slideChanged(slider) {
+        console.log(slider.track.details, slider.track.details.rel);
         setCurrentSlide(slider.track.details.rel);
       },
       created() {
@@ -163,17 +194,70 @@ const ProductPreview = ({ images }) => {
     [ThumbnailPlugin(instanceRef)]
   );
 
+  const handleMouseMove = (e, index) => {
+    setIsHover(true);
+
+    console.log(e);
+
+    const { left, top, width, height } = e.target.getBoundingClientRect();
+    const x = ((e.pageX - left - 10) / width) * 100;
+    const y = ((e.pageY - top - 4) / height) * 100;
+
+    console.log("e.pageX, left", e.pageX, left);
+    console.log("e.pageY, top", e.pageY, top);
+
+    // let offsetX, offsetY;
+    // var zoomer = e.currentTarget;
+    // e.offsetX ? (offsetX = e.offsetX) : (offsetX = e.touches[0].pageX);
+    // e.offsetY ? (offsetY = e.offsetY) : (offsetX = e.touches[0].pageX);
+    // let x = (offsetX / zoomer.offsetWidth) * 100;
+    // let y = (offsetY / zoomer.offsetHeight) * 100;
+
+    zoomerRef.current.style.backgroundPosition = x + "% " + y + "%";
+    setPosition({
+      idx: index,
+      x: x + "%",
+      y: y + "%",
+    });
+
+    console.log(x, y);
+    // console.log(currentSlide, images[currentSlide]);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHover(false);
+    zoomerRef.current.style.backgroundPosition = "0% 0%";
+  };
+
   return (
     <>
-      <S.SliderContainer ref={sliderRef} className="keen-slider">
-        {images.map((image, index) => (
-          <S.SliderItem key={index} className="keen-slider__slide">
-            <S.ProductImageWrapper>
-              <S.SlideProductImage src={image} />
-            </S.ProductImageWrapper>
-          </S.SliderItem>
-        ))}
-      </S.SliderContainer>
+      <S.ZoomerContainer>
+        <S.SliderContainer ref={sliderRef} className="keen-slider">
+          {images.map((image, index) => (
+            <S.SliderItem key={index} className="keen-slider__slide">
+              <S.ProductImageWrapper>
+                <S.SlideProductImage
+                  src={image}
+                  onMouseMove={(e) => handleMouseMove(e, index)}
+                  onMouseLeave={handleMouseLeave}
+                />
+              </S.ProductImageWrapper>
+            </S.SliderItem>
+          ))}
+        </S.SliderContainer>
+        {isHover && (
+          <S.ProductImageZoom
+            // onMouseMove={handleMouseMove}
+            // onMouseLeave={handleMouseLeave}
+            ref={zoomerRef}
+            src={images[position.idx]}
+            style={{
+              top: position.y,
+              left: position.x,
+            }}
+          />
+        )}
+      </S.ZoomerContainer>
       <S.SliderContainer
         ref={thumbnailRef}
         className="keen-slider thumbnail"
